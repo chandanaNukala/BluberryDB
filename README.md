@@ -76,7 +76,7 @@ The frontend should now be running and accessible in your browser.
 
 - After setting up, The frontend UI can be accessed at http://localhost:3000
 
-- you can access the backend API admin at http://localhost:8000/api/admin
+- you can access the backend API admin at http://localhost:8000/admin
 
 - To stop the services, use docker-compose down
 
