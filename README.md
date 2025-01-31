@@ -74,9 +74,9 @@ The frontend should now be running and accessible in your browser.
 
 ## Usage
 
-- After setting up, you can access the backend API at http://localhost:8000
+- After setting up, The frontend UI can be accessed at http://localhost:3000
 
-- The frontend UI can be accessed at http://localhost:3000
+- you can access the backend API at http://localhost:8000/api
 
 - To stop the services, use docker-compose down
 
