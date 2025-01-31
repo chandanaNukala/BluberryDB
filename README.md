@@ -19,8 +19,10 @@ Before running the application, ensure you have the following installed on your 
 
 1. Clone the Repository
 
+```
 git clone <repository-url>
 cd Blueberry_DB
+```
 
 2. Checkout to the Master Branch
 
