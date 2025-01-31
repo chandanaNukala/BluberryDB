@@ -15,7 +15,7 @@ SECRET_KEY = 'django-insecure-=&p)d9@fr@z3o*1&u2j+dmx3*f#4ti5y!h7=1wfxz5+*ng696i
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -83,16 +83,33 @@ WSGI_APPLICATION = 'blueberry.wsgi.application'
 #     }
 # }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'blueberry_project',
+#         'USER': 'blueberry',
+#         'PASSWORD': 'blueberry',
+#         'HOST': 'localhost',  # Use '127.0.0.1' if localhost doesn't work
+#         'PORT': '5432',       # Default PostgreSQL port
+#     }
+# }
+
+import os
+import dj_database_url
+
+# Static files settings
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Database configuration
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'blueberry_project',
-        'USER': 'blueberry',
-        'PASSWORD': 'blueberry',
-        'HOST': 'localhost',  # Use '127.0.0.1' if localhost doesn't work
-        'PORT': '5432',       # Default PostgreSQL port
-    }
+    'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
 }
+
+# Allow all hosts for now (update for production)
+ALLOWED_HOSTS = ['*']
+
+
 
 
 # Password validation
