@@ -3,9 +3,9 @@
 
 Blueberry_DB is a full-stack web application that consists of a backend built with Django and a frontend developed with React. It is containerized using Docker for seamless deployment and management
 
-# Getting Started
 
-# # Prerequisites
+
+## Prerequisites
 
 Before running the application, ensure you have the following installed on your system:
 
@@ -15,7 +15,7 @@ Before running the application, ensure you have the following installed on your 
 
 
 
-# Installation and Setup
+## Installation and Setup
 
 1. Clone the Repository
 
@@ -26,7 +26,7 @@ cd Blueberry_DB
 
 git checkout master
 
-# # Backend Setup
+### Backend Setup
 
 3. Navigate to the Backend Directory
 
@@ -53,7 +53,7 @@ python manage.py createsuperuser
 Follow the prompts to set up the superuser credentials.
 
 
-# # Frontend Setup
+### Frontend Setup
 
 8. Navigate to the Frontend Directory
 
@@ -69,7 +69,7 @@ npm start
 
 The frontend should now be running and accessible in your browser.
 
-# Usage
+## Usage
 
 - After setting up, you can access the backend API at http://localhost:8000
 
@@ -77,7 +77,7 @@ The frontend should now be running and accessible in your browser.
 
 - To stop the services, use docker-compose down
 
-# Features
+## Features
 
 - The application includes Login, Register, and Forgot Password options.
 
