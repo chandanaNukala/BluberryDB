@@ -25,50 +25,51 @@ cd Blueberry_DB
 ```
 
 2. Checkout to the Master Branch
-
+```
 git checkout master
+```
 
 ### Backend Setup
 
 3. Navigate to the Backend Directory
-
+```
 cd backend
-
+```
 4. Stop Any Running Containers (If Any)
-
+```
 docker-compose down
-
+```
 5. Start the Backend Services
-
+```
 docker-compose up -d
-
+```
 This will start the required services in detached mode.
 
 6. Access the Web Container
-
+```
 docker-compose exec web bash
-
+```
 7. Create a Superuser for Django Admin
-
+```
 python manage.py createsuperuser
-
+```
 Follow the prompts to set up the superuser credentials.
 
 
 ### Frontend Setup
 
 8. Navigate to the Frontend Directory
-
-cd frontend
-
+```
+cd Blueberry_DB/frontend
+```
 9. Install Dependencies
-
+```
 npm install
-
+```
 10. Start the Development Server
-
+```
 npm start
-
+```
 The frontend should now be running and accessible in your browser.
 
 ## Usage
