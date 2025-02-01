@@ -15,7 +15,7 @@ import {
   useMediaQuery,
   Stack,
 } from "@mui/material";
-import { Link, useHistory } from "react-router-dom"; // Import useHistory
+import {  useHistory } from "react-router-dom"; // Import useHistory
 import MenuIcon from "@mui/icons-material/Menu";
 import InfoIcon from "@mui/icons-material/Info";
 import AddBoxIcon from "@mui/icons-material/AddBox";
@@ -30,12 +30,12 @@ export default function Navbar() {
   const history = useHistory(); // Use useHistory for navigation
   const { logoutUser } = useContext(AuthContext);
   const token = localStorage.getItem("authTokens");
-  let user_id = null;
+  // let user_id = null;
   let username = "";
 
   if (token) {
     const decoded = jwtDecode(token);
-    user_id = decoded.user_id;
+    // user_id = decoded.user_id;
     username = decoded.username;
   }
 

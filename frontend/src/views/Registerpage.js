@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 
 function RegisterPage() {
-  const { sendOTP, registerUser } = useContext(AuthContext);
+  const {registerUser } = useContext(AuthContext);
   const history = useHistory();
 
   const [activeTab, setActiveTab] = useState(1);
