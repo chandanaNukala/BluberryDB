@@ -158,8 +158,11 @@ function LoginPage() {
         }}
       >
         <Typography variant="body2">
-          © {new Date().getFullYear()} Blueberry. All Rights Reserved.
-        </Typography>
+                  © {new Date().getFullYear()} Blueberry Genome Database. All Rights Reserved.
+                </Typography>
+                <Typography variant="body2">
+                  Powered by the Blueberry Breeding & Genomics Lab.
+                </Typography>
       </Box>
     </Box>
   );

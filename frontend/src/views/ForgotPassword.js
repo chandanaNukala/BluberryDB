@@ -156,6 +156,27 @@ function ForgotPasswordPage() {
           )}
         </CardContent>
       </Card>
+      <Box
+              component="footer"
+              sx={{
+                position: "fixed",
+                bottom: 0,
+                left: 0,
+                width: "100%",
+                backgroundColor: "#1976d2",
+                color: "white",
+                textAlign: "center",
+                py: 1.5,
+                boxShadow: "0px -2px 10px rgba(0, 0, 0, 0.1)",
+              }}
+            >
+              <Typography variant="body2">
+                        © {new Date().getFullYear()} Blueberry Genome Database. All Rights Reserved.
+                      </Typography>
+                      <Typography variant="body2">
+                        Powered by the Blueberry Breeding & Genomics Lab.
+                      </Typography>
+            </Box>
     </Box>
   );
 }
