@@ -1,7 +1,28 @@
 import React from "react";
 import { Box, Button, Card, CardContent, Container, CssBaseline, Grid, Typography } from "@mui/material";
-
+import Swal from "sweetalert2"; // Import SweetAlert2
+import { useHistory } from "react-router-dom"; 
 function HomePage() {
+  const history = useHistory();
+  const token = localStorage.getItem("authTokens");
+
+  const checkAuthAndNavigate = () => {
+    if (!token) {
+      Swal.fire({
+        icon: "warning",
+        title: "Access Denied",
+        text: "You must be logged in to view this page!",
+        confirmButtonColor: "#3085d6",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          history.push("/login");
+        }
+      });
+      return;
+    }
+    history.push("/database");
+  };
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "95vh" }}>
       <CssBaseline />
@@ -27,7 +48,7 @@ function HomePage() {
         <Button
           variant="contained"
           sx={{ mt: 3, bgcolor: "#1976d2", color: "white" }}
-          href="/database"
+          onClick={checkAuthAndNavigate} // Call authentication check
         >
           Explore the Database
         </Button>
