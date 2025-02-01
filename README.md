@@ -1,9 +1,25 @@
 # Blueberry_DB
 
+Blueberry_DB is a full-stack web application designed for secure and efficient database management. It features a Django backend and a React frontend, both containerized using Docker for seamless deployment. The application includes authentication features, user role management, and a responsive UI.
 
-Blueberry_DB is a full-stack web application that consists of a backend built with Django and a frontend developed with React. It is containerized using Docker for seamless deployment and management
+## Features
 
+- User Authentication: Register, Login, and Password Reset functionality.
+- Role-Based Access: Admin approval required for new user accounts.
+- Database Access: Users can explore the database after logging in.
+- Security Features: Hashed passwords, auto logout after inactivity.
+- Responsive UI: Optimized for desktop and mobile devices.
+- Admin Dashboard: Manage user registrations and permissions.
+- Session Management: Automatic logout after 5 minutes of inactivity.
 
+##  Tech Stack
+
+- Frontend: React, JavaScript, HTML, CSS
+- Backend: Django, Django REST Framework
+- Database: PostgreSQL 
+- Containerization: Docker, Docker Compose
+- Security: JWT Authentication, Password Hashing
+- Other Tools: Node.js, Git
 
 ## Prerequisites
 
@@ -119,10 +135,5 @@ The frontend should now be running and accessible in your browser.
 
 - To stop the services, use docker-compose down
 
-## Features
-
-- The application includes Login, Register, and Reset Password options.
-
-- Upon accessing the application, the user is directed to the Home Page.
-
-- To access the database, users must log in.
+### Installation guide video
+https://www.youtube.com/watch?v=euSWtnm8EfQ
