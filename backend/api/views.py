@@ -18,9 +18,30 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
 
 class RegisterView(generics.CreateAPIView):
-    queryset=User.objects.all()
-    permission_classes=([AllowAny])
-    serializer_class=RegisterSerializer
+    queryset = User.objects.all()
+    permission_classes = [AllowAny]
+    serializer_class = RegisterSerializer
+
+    def create(self, request, *args, **kwargs):
+        email = request.data.get("email")
+        username = request.data.get("username")
+        
+        if User.objects.filter(email=email).exists():
+            return Response({"error": "Email already registered. Please log in."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if User.objects.filter(username=username).exists():
+            return Response({"error": "Username already taken. Please choose another username."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        response = super().create(request, *args, **kwargs)
+        
+        # Notify admin about new registration
+        subject = "New User Registration Approval Required"
+        message = f"A new user {email} has registered. Please approve their account in the admin panel."
+        admin_email = "chandana.nukala24@gmail.com"
+        send_mail(subject, message, "no-reply@example.com", [admin_email])
+
+        return Response({"message": "Registration successful! Pending admin approval."}, status=status.HTTP_201_CREATED)
+
 
 @api_view(['GET','POST'])
 @permission_classes([IsAuthenticated])
@@ -128,5 +149,59 @@ def reset_password(request):
         user.save()
 
         return Response({"message": "Password reset successful."}, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+    
+
+from django.contrib.auth.hashers import make_password
+from django.utils.crypto import get_random_string
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def approve_user(request):
+    if not request.user.is_staff:
+        return Response({"error": "Permission denied"}, status=status.HTTP_403_FORBIDDEN)
+
+    email = request.data.get("email")
+    try:
+        user = User.objects.get(email=email, is_active=False)
+
+        # Generate random password
+        random_password = get_random_string(length=10)
+        user.set_password(random_password)
+        user.is_active = True
+        user.save()
+
+        # Send email to user with password
+        subject = "Your Account is Approved"
+        message = f"Your account has been approved. Your temporary password is: {random_password}\n Please log in and change your password."
+        send_mail(subject, message, "no-reply@example.com", [email])
+
+        return Response({"message": "User approved and password sent."}, status=status.HTTP_200_OK)
+
+    except User.DoesNotExist:
+        return Response({"error": "User not found or already approved."}, status=status.HTTP_404_NOT_FOUND)
+from django.contrib.auth import authenticate
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+@api_view(['POST'])
+def verify_old_password(request):
+    print(request)
+    email = request.data.get('email')
+    old_password = request.data.get('oldPassword')
+    if not email or not old_password:
+        return Response({"error": "Email and old password are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        user = User.objects.get(email=email)
+        if user.check_password(old_password):
+            return Response({"message": "Old password verified successfully."}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Incorrect old password."}, status=status.HTTP_400_BAD_REQUEST)
     except User.DoesNotExist:
         return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)

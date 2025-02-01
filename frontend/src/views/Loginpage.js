@@ -85,7 +85,7 @@ function LoginPage() {
           >
             <Tab label="Login" />
             <Tab label="Register" />
-            <Tab label="Forgot Password" />
+            <Tab label="Reset Password" />
           </Tabs>
           <CardContent sx={{ padding: 3 }}>
             {activeTab === 0 && (

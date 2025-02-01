@@ -27,6 +27,10 @@ Before running the application, ensure you have the following installed on your 
 
 ```
 git clone https://github.com/chandanaNukala/BluberryDB.git
+
+```
+
+```
 cd Blueberry_DB
 ```
 

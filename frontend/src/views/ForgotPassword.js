@@ -1,8 +1,6 @@
 import React, { useState, useContext } from "react";
 import { useHistory } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
-
-
 import {
   Box,
   Button,
@@ -16,17 +14,15 @@ import {
   InputAdornment,
   IconButton,
 } from "@mui/material";
-
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
-
 function ForgotPasswordPage() {
-    const [showPassword, setShowPassword] = useState(false);
-    const [showPassword2, setShowPassword2] = useState(false);
-  const { sendOTP, verifyOTP, resetPassword } = useContext(AuthContext);
-  const [activeTab, setActiveTab] = useState(2); // 0: Login, 1: Register, 2: Forgot Password
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword2, setShowPassword2] = useState(false);
+  const { verifyOldPassword, resetPassword } = useContext(AuthContext);
+  const [activeTab, setActiveTab] = useState(2);
   const [step, setStep] = useState(0);
-  const [form, setForm] = useState({ email: "", otp: "", newPassword: "", confirmPassword: "" });
+  const [form, setForm] = useState({ email: "", oldPassword: "", newPassword: "", confirmPassword: "" });
   const [apiErrors, setApiErrors] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const history = useHistory();
@@ -42,43 +38,25 @@ function ForgotPasswordPage() {
     if (newValue === 2) history.push("/forgotpassword");
   };
 
-  const [loading, setLoading] = useState(false); // Add loading state
+  const validatePassword = (password) => {
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return regex.test(password);
+  };
 
-    const handleSendOTP = async (e) => {
-      e.preventDefault();
-      setApiErrors("");
-      setSuccessMessage("");
-      
-      if (form.email.trim() === "") {
-        setApiErrors("Email is required.");
-        return;
-      }
-
-      setLoading(true); // Start loading
-      const success = await sendOTP(form.email, "forgot_password");
-      setLoading(false); // Stop loading
-
-      if (success) {
-        setStep(1);
-        setSuccessMessage("OTP sent successfully to your email!");
-      }
-    };
-
-
-  const handleVerifyOTP = async (e) => {
+  const handleVerifyOldPassword = async (e) => {
     e.preventDefault();
     setApiErrors("");
     setSuccessMessage("");
-    if (form.otp.trim() === "") {
-      setApiErrors("OTP is required.");
+    if (form.email.trim() === "" || form.oldPassword.trim() === "") {
+      setApiErrors("Email and old password are required.");
       return;
     }
-    const otpVerified = await verifyOTP(form.email, form.otp);
-    if (otpVerified) {
-      setStep(2);
-      setSuccessMessage("OTP Verified! You can now reset your password.");
+    const verified = await verifyOldPassword(form.email, form.oldPassword);
+    if (verified) {
+      setStep(1);
+      setSuccessMessage("Old password verified! You can now reset your password.");
     } else {
-      setApiErrors("Invalid OTP. Please try again.");
+      setApiErrors("Invalid email or old password. Please try again.");
     }
   };
 
@@ -94,6 +72,10 @@ function ForgotPasswordPage() {
       setApiErrors("Passwords do not match.");
       return;
     }
+    if (!validatePassword(form.newPassword)) {
+      setApiErrors("Password must be at least 8 characters, include uppercase, lowercase, a number, and a special character.");
+      return;
+    }
     await resetPassword(form.email, form.newPassword);
     setSuccessMessage("Password reset successful! Please login with your new password.");
     history.push("/login");
@@ -101,43 +83,33 @@ function ForgotPasswordPage() {
 
   return (
     <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "80vh", padding: 2 }}>
-      <Card sx={{ maxWidth: 450, width: "100%", boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", borderRadius: 4, overflow: "hidden" }}>
-        <Tabs value={activeTab} onChange={handleTabChange} variant="fullWidth" textColor="primary" indicatorColor="primary"
-        sx={{
-            "& .MuiTabs-indicator": {
-              backgroundColor: "#1976d2",
-            },
-            "& .MuiTab-root": {
-              fontWeight: "bold",
-              fontSize: "16px",
-              padding: 1,
-            },
-          }}>
+      <Card sx={{ maxWidth: 450, width: "100%", boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", borderRadius: 4 }}>
+        <Tabs
+          value={activeTab}
+          onChange={handleTabChange}
+          variant="fullWidth"
+          textColor="primary"
+          indicatorColor="primary"
+          sx={{ "& .MuiTabs-indicator": { backgroundColor: "#1976d2" }, "& .MuiTab-root": { fontWeight: "bold", fontSize: "16px", padding: 1 } }}
+        >
           <Tab label="Login" />
           <Tab label="Register" />
-          <Tab label="Forgot Password" />
+          <Tab label="Reset Password" />
         </Tabs>
         <CardContent sx={{ padding: 3 }}>
           <Typography variant="h5" textAlign="center" mb={2}>
-            {step === 0 ? "Forgot Password" : step === 1 ? "Verify OTP" : "Reset Password"}
+            {step === 0 ? "Verify Old Password" : "Reset Password"}
           </Typography>
           {successMessage && <Alert severity="success" sx={{ mb: 2 }}>{successMessage}</Alert>}
           {apiErrors && <Alert severity="error" sx={{ mb: 2 }}>{apiErrors}</Alert>}
           {step === 0 && (
-            <form onSubmit={handleSendOTP}>
+            <form onSubmit={handleVerifyOldPassword}>
               <TextField fullWidth label="Enter your email" name="email" type="email" value={form.email} onChange={handleChange} margin="normal" variant="outlined" required />
-              <Button type="submit" fullWidth variant="contained" sx={{ mt: 2 }} disabled={loading}>
-              {loading ? "Sending OTP..." : "Get OTP to verify Email"}
-            </Button>
+              <TextField fullWidth label="Enter old password" name="oldPassword" type="password" value={form.oldPassword} onChange={handleChange} margin="normal" variant="outlined" required />
+              <Button type="submit" fullWidth variant="contained" sx={{ mt: 2 }}>Verify Old Password</Button>
             </form>
           )}
           {step === 1 && (
-            <form onSubmit={handleVerifyOTP}>
-              <TextField fullWidth label="Enter OTP" name="otp" type="text" value={form.otp} onChange={handleChange} margin="normal" variant="outlined" required />
-              <Button type="submit" fullWidth variant="contained" sx={{ mt: 2 }}>Verify OTP</Button>
-            </form>
-          )}
-          {step === 2 && (
             <form onSubmit={handleResetPassword}>
               <TextField
                 fullWidth
@@ -152,7 +124,7 @@ function ForgotPasswordPage() {
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                      <IconButton onClick={() => setShowPassword(!showPassword)}>
                         {showPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
                     </InputAdornment>
@@ -161,7 +133,7 @@ function ForgotPasswordPage() {
               />
               <TextField
                 fullWidth
-                label="Verify new password"
+                label="Confirm new password"
                 name="confirmPassword"
                 type={showPassword2 ? "text" : "password"}
                 value={form.confirmPassword}
@@ -172,7 +144,7 @@ function ForgotPasswordPage() {
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton onClick={() => setShowPassword2(!showPassword2)} edge="end">
+                      <IconButton onClick={() => setShowPassword2(!showPassword2)}>
                         {showPassword2 ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
                     </InputAdornment>
@@ -180,30 +152,10 @@ function ForgotPasswordPage() {
                 }}
               />
               <Button type="submit" fullWidth variant="contained" sx={{ mt: 2 }}>Reset Password</Button>
-
             </form>
           )}
         </CardContent>
       </Card>
-      {/* Footer Section */}
-      <Box
-        component="footer"
-        sx={{
-          position: "fixed",
-          bottom: 0,
-          left: 0,
-          width: "100%",
-          backgroundColor: "#1976d2",
-          color: "white",
-          textAlign: "center",
-          py: 1.5,
-          boxShadow: "0px -2px 10px rgba(0, 0, 0, 0.1)",
-        }}
-      >
-        <Typography variant="body2">
-          © {new Date().getFullYear()} Blueberry. All Rights Reserved.
-        </Typography>
-      </Box>
     </Box>
   );
 }

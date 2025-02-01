@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import SendOTPView, VerifyOTPView,reset_password
+from .views import SendOTPView, VerifyOTPView,reset_password,approve_user,verify_old_password
 
 from rest_framework_simplejwt.views import (
     TokenRefreshView,
@@ -14,5 +14,8 @@ urlpatterns = [
     path("send-otp/", SendOTPView.as_view(), name="send-otp"),
     path("verify-otp/", VerifyOTPView.as_view(), name="verify-otp"),
     path('reset-password/', reset_password, name="reset_password"),
+    path('approve-user/', approve_user, name="approve-user"),
+    path('verify-old-password/', verify_old_password, name="verify-old-password"),
+
   
 ]

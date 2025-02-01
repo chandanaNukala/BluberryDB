@@ -10,30 +10,23 @@ import {
   Typography,
   Tabs,
   Tab,
-  InputAdornment,
-  IconButton,
   Alert,
 } from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 function RegisterPage() {
-  const { sendOTP, verifyOTP, registerUser } = useContext(AuthContext);
+  const { sendOTP, registerUser } = useContext(AuthContext);
   const history = useHistory();
 
-  const [activeTab, setActiveTab] = useState(1); // 0: Login, 1: Register, 2: Forgot Password
+  const [activeTab, setActiveTab] = useState(1);
   const [form, setForm] = useState({
-    username: "",
     email: "",
-    password: "",
-    password2: "",
-    otp: "",
+    confirmEmail: "",
+    username: "",
   });
-
-  const [step, setStep] = useState(1);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showPassword2, setShowPassword2] = useState(false);
+  
   const [apiErrors, setApiErrors] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -45,98 +38,87 @@ function RegisterPage() {
     else if (newValue === 2) history.push("/forgotpassword");
   };
 
-  const [loading, setLoading] = useState(false); // Add loading state
-
-  const handleSendOTP = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     setApiErrors("");
     setSuccessMessage("");
 
-    if (form.email.trim() === "") {
-      setApiErrors("Email is required.");
-      return;
+    if (form.email.trim() === "" || form.confirmEmail.trim() === "" || form.username.trim() === "") {
+        setApiErrors("All fields are required.");
+        return;
     }
 
-    setLoading(true); // Start loading
-    const success = await sendOTP(form.email, "register_password");
-    setLoading(false); // Stop loading
-
-    if (success) {
-      setStep(2);
-      setSuccessMessage("OTP sent successfully to your email!");
-    }
-  };
-
-
-  const handleVerifyOTPAndRegister = async (e) => {
-    e.preventDefault();
-    setApiErrors("");
-    setSuccessMessage("");
-
-    if (form.otp.trim() === "" || form.password !== form.password2) {
-      setApiErrors("Invalid OTP or passwords do not match.");
-      return;
+    if (form.email !== form.confirmEmail) {
+        setApiErrors("Emails do not match.");
+        return;
     }
 
-    const otpVerified = await verifyOTP(form.email, form.otp);
-    if (otpVerified) {
-      await registerUser(form.email, form.username, form.password, form.password2, form.otp);
-    } else {
-      setApiErrors("OTP verification failed.");
+    setLoading(true);
+    try {
+        const data = await registerUser(form.email, form.username);
+        if (data) {
+          setSuccessMessage(`Thank you, ${form.email}, for applying for an account. Your registration is currently under review by the site administrator. You will receive an email with further instructions once your account is approved.`);
+        }
+    } catch (error) {
+        setApiErrors(error.message);
     }
-  };
+    setLoading(false);
+};
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "80vh",
-        padding: 2,
-      }}
-    >
-      <Card
-        sx={{
-          maxWidth: 450,
-          width: "100%",
-          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
-          borderRadius: 4,
-          overflow: "hidden",
-        }}
-      >
-      
+    <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "80vh", padding: 2 }}>
+      <Card sx={{ maxWidth: 450, width: "100%", boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", borderRadius: 4, overflow: "hidden" }}>
         <Tabs
           value={activeTab}
           onChange={handleTabChange}
           variant="fullWidth"
           textColor="primary"
           indicatorColor="primary"
-          sx={{
-            "& .MuiTabs-indicator": { backgroundColor: "#1976d2" },
-            "& .MuiTab-root": { fontWeight: "bold", fontSize: "16px", padding: 1 },
-          }}
+          sx={{ "& .MuiTabs-indicator": { backgroundColor: "#1976d2" }, "& .MuiTab-root": { fontWeight: "bold", fontSize: "16px", padding: 1 } }}
         >
           <Tab label="Login" />
           <Tab label="Register" />
-          <Tab label="Forgot Password" />
+          <Tab label="Reset Password" />
         </Tabs>
         <CardContent sx={{ padding: 3 }}>
           <Typography variant="h5" textAlign="center" mb={2}>
-            {step === 1 ? "Register" : "Verify OTP"}
+            Register
           </Typography>
 
-          {successMessage && <Alert severity="success" sx={{ mb: 2 }}>{successMessage}</Alert>}
+          {successMessage && (
+            <>
+              <Alert severity="success" sx={{ mb: 2 }}>{successMessage}</Alert>
+              <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
+                <Button variant="contained" onClick={() => history.push("/login")}>
+                  Go to Login
+                </Button>
+                <Button variant="outlined" onClick={() => history.push("/")}>
+                  Go to Home
+                </Button>
+              </Box>
+            </>
+          )}
           {apiErrors && <Alert severity="error" sx={{ mb: 2 }}>{apiErrors}</Alert>}
 
-          {step === 1 ? (
-            <form onSubmit={handleSendOTP}>
+          {!successMessage && (
+            <form onSubmit={handleRegister}>
               <TextField
                 fullWidth
                 label="Email"
                 name="email"
                 type="email"
                 value={form.email}
+                onChange={handleChange}
+                margin="normal"
+                variant="outlined"
+                required
+              />
+              <TextField
+                fullWidth
+                label="Confirm Email"
+                name="confirmEmail"
+                type="email"
+                value={form.confirmEmail}
                 onChange={handleChange}
                 margin="normal"
                 variant="outlined"
@@ -153,46 +135,6 @@ function RegisterPage() {
                 variant="outlined"
                 required
               />
-              <TextField
-                fullWidth
-                label="Password"
-                name="password"
-                type={showPassword ? "text" : "password"}
-                value={form.password}
-                onChange={handleChange}
-                margin="normal"
-                variant="outlined"
-                required
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-              <TextField
-                fullWidth
-                label="Confirm Password"
-                name="password2"
-                type={showPassword2 ? "text" : "password"}
-                value={form.password2}
-                onChange={handleChange}
-                margin="normal"
-                variant="outlined"
-                required
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={() => setShowPassword2(!showPassword2)} edge="end">
-                        {showPassword2 ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
               <Button
                 type="submit"
                 fullWidth
@@ -200,55 +142,12 @@ function RegisterPage() {
                 sx={{ mt: 2, backgroundColor: "#1976d2", "&:hover": { backgroundColor: "#145ca4" } }}
                 disabled={loading}
               >
-                {loading ? "Sending OTP..." : "Get OTP to Verify Email"}
-              </Button>
-
-            </form>
-          ) : (
-            <form onSubmit={handleVerifyOTPAndRegister}>
-              <TextField
-                fullWidth
-                label="Enter OTP"
-                name="otp"
-                type="text"
-                value={form.otp}
-                onChange={handleChange}
-                margin="normal"
-                variant="outlined"
-                required
-              />
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{ mt: 2, backgroundColor: "#1976d2", "&:hover": { backgroundColor: "#145ca4" } }}
-              >
-                Verify & Register
+                {loading ? "Processing..." : "Register"}
               </Button>
             </form>
           )}
-          
         </CardContent>
       </Card>
-      {/* Footer Section */}
-      <Box
-        component="footer"
-        sx={{
-          position: "fixed",
-          bottom: 0,
-          left: 0,
-          width: "100%",
-          backgroundColor: "#1976d2",
-          color: "white",
-          textAlign: "center",
-          py: 1.5,
-          boxShadow: "0px -2px 10px rgba(0, 0, 0, 0.1)",
-        }}
-      >
-        <Typography variant="body2">
-          © {new Date().getFullYear()} Blueberry. All Rights Reserved.
-        </Typography>
-      </Box>
     </Box>
   );
 }

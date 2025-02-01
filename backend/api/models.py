@@ -35,7 +35,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     is_active = models.BooleanField(default=True)  # Required for authentication
     is_staff = models.BooleanField(default=False)  # Required for Django Admin
-    
+    date_joined = models.DateTimeField(auto_now_add=True)
     objects = UserManager()
 
     USERNAME_FIELD = 'email'  # Login using email

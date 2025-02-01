@@ -66,46 +66,49 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Register User
-  const registerUser = async (email, username, password, password2,otp) => {
+
+  const registerUser = async (email, username) => {
     try {
         const response = await fetch("http://127.0.0.1:8000/api/register/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, username, password, password2,otp }),
-      });
-
-      const data = await response.json();
-      console.log(data)
-
-      if (response.status === 201) {
-        history.push("/login");
-        swal.fire({
-          title: "Registration Successful! Login Now",
-          icon: "success",
-          toast: true,
-          timer: 2000,
-          position: "top-right",
-          timerProgressBar: true,
-          showConfirmButton: false,
-          showCloseButton:true
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, username }),
         });
-      } else {
-        throw new Error(data.error || "Registration failed.");
-      }
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Registration failed.");
+        }
+
+        swal.fire({
+            title: "Success",
+            text: data.message,
+            icon: "success",
+            toast: true,
+            timer: 2000,
+            position: "top-right",
+            timerProgressBar: true,
+            showConfirmButton: false,
+            showCloseButton: true
+        });
+
+        return true;
     } catch (error) {
-      swal.fire({
-        title: "Error",
-        text: error.message,
-        icon: "error",
-        toast: true,
-        timer: 2000,
-        position: "top-right",
-        timerProgressBar: true,
-        showConfirmButton: false,
-        showCloseButton:true
-      });
+        swal.fire({
+            title: "Error",
+            text: error.message,
+            icon: "error",
+            toast: true,
+            timer: 2000,
+            position: "top-right",
+            timerProgressBar: true,
+            showConfirmButton: false,
+            showCloseButton: true
+        });
+        return false;
     }
-  };
+};
 
   // Send OTP
   const sendOTP = async (email,parmtext) => {
@@ -232,7 +235,26 @@ const resetPassword = async (email, newPassword) => {
     return false;
   }
 };
+const verifyOldPassword = async (email, oldPassword) => {
+  try {
+    const response = await fetch("http://127.0.0.1:8000/api/verify-old-password/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, oldPassword }),
+    });
 
+    if (!response.ok) {
+      throw new Error("Invalid email or old password");
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error verifying old password:", error);
+    return false;
+  }
+};
 
   // Logout User
   const logoutUser = () => {
@@ -280,6 +302,7 @@ const resetPassword = async (email, newPassword) => {
     sendOTP,
     verifyOTP,
     resetPassword,
+    verifyOldPassword,
 
   };
 
