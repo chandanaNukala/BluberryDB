@@ -34,7 +34,7 @@ function LoginPage() {
     if (newValue === 1) {
       history.push("/register"); // Navigate to the Register page
     } else if (newValue === 2) {
-      history.push("/forgotpassword"); // Navigate to the Reset Password page
+      history.push("/resetpassword"); // Navigate to the Reset Password page
     }
   };
 

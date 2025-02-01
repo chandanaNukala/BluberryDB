@@ -35,7 +35,7 @@ function RegisterPage() {
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
     if (newValue === 0) history.push("/login");
-    else if (newValue === 2) history.push("/forgotpassword");
+    else if (newValue === 2) history.push("/resetpassword");
   };
 
   const handleRegister = async (e) => {

@@ -11,7 +11,7 @@ from rest_framework import generics,status
 from rest_framework.permissions import AllowAny,IsAuthenticated
 
 from rest_framework.response import Response
-
+from django.utils.html import format_html
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class=MyTokenObtainPairSerializer
@@ -35,10 +35,48 @@ class RegisterView(generics.CreateAPIView):
         response = super().create(request, *args, **kwargs)
         
         # Notify admin about new registration
-        subject = "New User Registration Approval Required"
-        message = f"A new user {email} has registered. Please approve their account in the admin panel."
-        admin_email = "chandana.nukala24@gmail.com"
-        send_mail(subject, message, "no-reply@example.com", [admin_email])
+        admin_emails = list(User.objects.filter(is_staff=True).values_list('email', flat=True))
+
+        if admin_emails:
+            subject = "🔔 New User Registration Pending Approval"
+
+            html_message = format_html(
+            """
+            <html>
+            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; padding: 20px;">
+                <p>Dear Admin,</p>
+
+                <p>A new user has registered on the platform and requires approval.</p>
+
+                <h3 style="color: #0056b3;">📌 User Details:</h3>
+                <ul style="background: #f9f9f9; padding: 10px; border-radius: 5px;">
+                    <li><strong>Email:</strong> {email}</li>
+                </ul>
+
+                <p>Please review and approve the account in the admin panel.</p>
+
+                <p style="text-align: center;">
+                    <a href="http://localhost:8000/admin" 
+                       style="background-color: #0056b3; color: #fff; padding: 10px 15px; 
+                              text-decoration: none; border-radius: 5px; display: inline-block;">
+                       🔗 Approve User in Admin Panel
+                    </a>
+                </p>
+
+            </body>
+            </html>
+            """,
+                email=email
+            )
+
+            send_mail(
+                subject,
+                "",  # Plain text part (optional)
+                "no-reply@example.com",
+                admin_emails,
+                html_message=html_message
+            )
+
 
         return Response({"message": "Registration successful! Pending admin approval."}, status=status.HTTP_201_CREATED)
 

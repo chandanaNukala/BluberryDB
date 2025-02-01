@@ -19,6 +19,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 function ForgotPasswordPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showPassword2, setShowPassword2] = useState(false);
+  const [showPassword0, setShowPassword0] = useState(false);
   const { verifyOldPassword, resetPassword } = useContext(AuthContext);
   const [activeTab, setActiveTab] = useState(2);
   const [step, setStep] = useState(0);
@@ -35,7 +36,7 @@ function ForgotPasswordPage() {
     setActiveTab(newValue);
     if (newValue === 0) history.push("/login");
     if (newValue === 1) history.push("/register");
-    if (newValue === 2) history.push("/forgotpassword");
+    if (newValue === 2) history.push("/resetpassword");
   };
 
   const validatePassword = (password) => {
@@ -105,7 +106,16 @@ function ForgotPasswordPage() {
           {step === 0 && (
             <form onSubmit={handleVerifyOldPassword}>
               <TextField fullWidth label="Enter your email" name="email" type="email" value={form.email} onChange={handleChange} margin="normal" variant="outlined" required />
-              <TextField fullWidth label="Enter old password" name="oldPassword" type="password" value={form.oldPassword} onChange={handleChange} margin="normal" variant="outlined" required />
+              <TextField fullWidth label="Enter old password" name="oldPassword"  type={showPassword0 ? "text" : "password"} value={form.oldPassword} onChange={handleChange} margin="normal" variant="outlined" required 
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowPassword0(!showPassword0)}>
+                      {showPassword0 ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}/>
               <Button type="submit" fullWidth variant="contained" sx={{ mt: 2 }}>Verify Old Password</Button>
             </form>
           )}

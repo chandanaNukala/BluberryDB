@@ -50,7 +50,7 @@ function App() {
           <PrivateRoute component={Database} path="/database" exact />
           <Route component={Loginpage} path="/login" />
           <Route component={Registerpage} path="/register" exact />
-          <Route component={ForgotPasswordPage} path="/forgotpassword" exact />
+          <Route component={ForgotPasswordPage} path="/resetpassword" exact />
           <Route component={Homepage} path="/" exact />
         </Switch>
       </AuthProvider>
