@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
+from django.utils.timezone import now
 from django.contrib.auth import get_user_model
 # Custom User Manager
 class UserManager(BaseUserManager):
@@ -36,7 +37,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     is_active = models.BooleanField(default=True)  # Required for authentication
     is_staff = models.BooleanField(default=False)  # Required for Django Admin
-    date_joined = models.DateTimeField(auto_now_add=True)
+    date_joined = models.DateTimeField(default=now) 
     objects = UserManager()
 
     USERNAME_FIELD = 'email'  # Login using email
