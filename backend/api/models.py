@@ -17,6 +17,7 @@ class UserManager(BaseUserManager):
         user = self.create_user(email=email, username=username, password=password)
         user.is_staff = True
         user.is_superuser = True
+        user.date_joined = timezone.now() 
         user.save(using=self._db)
         return user
     
